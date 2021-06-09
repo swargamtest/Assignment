@@ -1,0 +1,72 @@
+//Targeting Db after importing it
+use population
+
+//Atlanta question query
+db.zipcodes.find()
+db.zipcodes.aggregate([ 
+    { $match: {
+       city:"ATLANTA"}
+    },
+    {
+        $group:{
+          _id:"$city",
+          count:{$sum:1}
+        }
+      
+    }
+    ])
+    
+db.zipcodes.aggregate([ 
+    { $match: {
+       city:"ATLANTA"}
+    },
+    {
+        $group:{
+          _id:{city:"$city"},//u canno add pop in group as it will group city and pop which will make it worse
+          total:{$sum:"$pop"}
+        }
+      
+    }
+    // {
+
+    // $project: {
+    //   totalpop:{$sum:"$pop"}
+    // }
+    // }
+    ])
+
+
+
+///////////////////STATE QUERY QUESTION/////////////////////
+    db.zipcodes.aggregate([ 
+      {
+        $group:{
+          _id:{state:"$state"},
+          total:{$sum:"$pop"},
+          count:{}
+        }
+      
+    }
+    
+    ])
+
+  
+    db.zipcodes.aggregate([ 
+      {
+        $group:{
+          _id:{state:"$state"},
+          total:{$sum:"$pop"},
+          
+        }
+      
+    },
+    {
+      $sort: {total: -1}
+    },
+    {
+      $limit: 3
+    }
+    
+    ])
+
+/////////////////////////STATE-COUNTRY QUESTION////////////////////////////

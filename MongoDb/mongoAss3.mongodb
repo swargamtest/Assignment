@@ -1,0 +1,227 @@
+//Going to db after connecting it
+show databases
+use restaurants
+
+//Question 1-4 same type only some stuff to change
+db.addresses.aggregate([
+    {
+      $project: {
+         "_id":0,
+         "address.zipcode":1,
+         "borough":1
+         }
+    }
+  ])
+//note:you cannot add to field of document as borough:1 nad cruisine:0 i one have to be either 1 and all or vice versa
+
+
+//Question 5-7
+db.addresses.find()
+db.addresses.find({borough:"Bronx"}).limit(5).skip(5)
+
+//Question 8-9
+db.addresses.find({"grades.score":{$gt:90}})
+db.addresses.aggregate([
+  {
+    $match: {
+      "grades.score":{$gt:90}
+    }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         restaurant_id:1,
+         grades:1
+     }
+         
+  }]).pretty()
+
+  //Question 10
+  db.addresses.find({"address.coord":{$lt:-95.751468}})
+  //above will see if one of the filed is less than 95 other syntx is address.coord.0
+
+  //Question 11-13
+  db.addresses.find({"cuisine":{$ne:"American "},borough:{$ne:"Brooklyn"},"grades.0.grade":"A"}).pretty().sort({"cuisine":-1}).limit(3)
+  //there is space in america so thats why it doesnt work with just "AMERICAN" it has to be "AMERICAN "
+  db.addresses.aggregate([
+  {
+    $match: {
+      "cuisine":{$ne:"American "},borough:{$ne:"Brooklyn"},"grades.0.grade":"A"
+    }
+  },
+  {
+     $sort: {
+         "cuisine":-1
+     }
+  },
+     { $limit:3}
+         
+  ]).pretty()
+
+//Question 14-16
+db.addresses.createIndex( { name: "text", description: "text" } )
+db.addresses.find({name:{$regex:"Wil"}}).limit(2)
+db.addresses.aggregate([
+  {
+    $match: {
+      name:{$regex:"^Wil"}
+    }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         restaurant_id:1,
+         grades:1
+     }
+         
+  }]).pretty()
+
+
+//question 17-19
+db.addresses.find({
+  $and:[ 
+    {borough:"Bronx"},
+    {$or: [{"cuisine" : "American "}, {"cuisine" : "Chinese"}]}
+    ]
+   }).limit(2).pretty()
+
+db.addresses.aggregate([
+  {
+    $match: 
+        {$or: [{"borough" : "Staten Islands "}, {"borough" : "Queens"},{"borough":"Bronx Brooklyn"}]}
+        //or yoy could have used nin operator { borough : {$nin : ["Brooklyn", "Queens", "Staten Island"]}}
+  },
+  {
+     $project: {
+         name:1,
+         restaurant_id:1,
+         borough:1
+     }
+         
+  }]).pretty()
+
+
+//Question 20-21
+db.addresses.aggregate([
+  {
+    $match: {
+      "grades.score":{$lte:10}
+    }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         restaurant_id:1,
+         grades:1,
+         borough:1
+     }
+         
+  }]).pretty()
+
+
+//Question 22-23
+  db.addresses.aggregate([
+  {
+    $match: {
+      cuisine : {$nin : ["American ", "Chinese"]}, name:{$regex:"^Wil"}
+    }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         restaurant_id:1,
+         grades:1,
+         borough:1
+     }
+         
+  }]).pretty()
+
+  db.addresses.aggregate([
+  {
+    $match: {
+        "grades.0.score" : 11, "grades.0.grade" : "A"
+    
+  }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         restaurant_id:1,
+         grades:1,
+     }
+         
+  }]).pretty()
+
+  //Question 24
+
+  db.addresses.aggregate([
+  {
+    $match: {
+       $and: [{"address.coord.1" : {$gte:42.0000000}},{"address.coord.1":{$lte:52}}]
+        
+  }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         restaurant_id:1,
+         address:1,
+     }
+         
+  }]).pretty()
+
+  //Question 25-26
+  db.addresses.find().sort( { "name": 1} )
+  //for 26 question chnage value to -1 in name
+
+  //Question 27
+    db.addresses.find().sort( { "cuisine": 1,"borough":-1} )
+
+  //question 28
+  db.addresses.find({ "address.street": { $exists: true, $ne: null } })
+
+//Question 31
+db.addresses.aggregate([
+  {
+    $match: {
+      name:{$regex:"mon*"}
+    }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         borough:1,
+         cuisine:1,
+         "address.coord": { $arrayElemAt: [ "$address.coord", 0 ] },
+     }
+         
+  }]).pretty()
+
+
+
+//Question 32
+db.addresses.aggregate([
+  {
+    $match: {
+      name:{$regex:"Mad"}
+    }
+  },
+  {
+     $project: {
+         "_id":0,
+         name:1,
+         borough:1,
+         cuisine:1,
+         "address.coord": { $arrayElemAt: [ "$address.coord", 0 ] },
+     }
+         
+  }]).pretty()
+
+  

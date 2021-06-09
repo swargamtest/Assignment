@@ -1,0 +1,214 @@
+
+//Going to that database
+show dbs
+use test
+
+//Inserting documents
+db.movies.insertMany([
+{
+  title:'Fight club',
+  writer:'Chuck Palahniuko',
+  year:1999,
+  actors:[
+    'Brad pitt',
+    'Edward nortan'
+  ]
+},
+{
+   title:'Pulp fiction',
+   writer:'Quentin Tarantino',
+   year:1994,
+   actors:[
+     'John Travolta',
+     'Uma thurman'
+   ]
+},
+
+{
+  title:'Inglorious Basterds',
+  writer:'Quentin Tarantino',
+  year:2009,
+  actors:[
+    'Brad Pitt',
+    'Diane Kruger',
+    'Eli Roth'
+  ]
+},
+{
+  title:"The Hobbit:An Unexpected Journey",
+  writer:'J.R.R Tolkein',
+  year:2012,
+  franchise:'The Hobbit'
+},
+{
+  title:'The Hobbit:The Desolation of Smaug',
+  writer:'J.R.R Tolkein',
+  year:'2013',
+  franchise:'The Hobbit'
+},
+{
+  title:'The Hobbit:The Desolation of Smaug',
+  writer:'J.R.R Tolkein',
+  year:2012,
+  franchise:'The Hobbit',
+  synopsis:'Bilbo and company are forced to engage in a war against an array of'
+
+},
+{
+  title:'pee wee herman'
+},
+{
+  title:'avatar'
+}
+
+])
+
+//Find documents question
+db.movies.find()
+db.movies.find({writer:"Quentin Tarantino"})
+db.movies.find({actors:"Brad pitt"})
+db.movies.find( { actors: { $all: ["brad pitt"] } } )
+db.movies.find({$or: [{"year" : {$lt :2000}}, {"year" : {$gt :2010}}]})
+
+
+//Udate Documents question
+db.movies.updateOne(
+  { title:"The Hobbit:An Unexpected Journey"},
+{
+  $set: {
+    synopsis:"A reluctant hobbit, Bilbo Baggins, sets out to the Lonely Mountain with a spirited groupof dwarves to reclaim their mountain home -and the gold within it -from the dragon Smaug."
+  }
+})
+db.movies.updateOne(
+  {title:"Pulp fiction"},
+     {
+      $push: { actors: "Samuel L Jackson" }
+    }
+  
+)
+
+//Text search question
+db.movies.find()
+db.movies.createIndex( { synopsis: "text", description: "text" } )
+db.movies.find( { $text: { $search: "dwarves Hobbit" } } )
+
+
+//Delete Filed question
+db.movies.remove({title: "avatar"})
+
+
+////////////////////////////Second part//////////////////////////////
+show dbs
+show collections
+db.users.insertMany([
+  {
+    username:"GoodGuyGreg",
+    first_name:"GoodGuy",
+    last_name:"Greg"
+  },
+  {
+    username:"ScumbagStevefull_name",
+    first:"Scumbag",
+    last:"Steve"
+  }
+  ])
+
+db.posts.insertMany([
+  {
+    username:"GoodGuyGreg",
+    title:"Passes out at party",
+    body:"Wakes up early and cleans house"
+  },
+  {
+    username:"GoodGuyGreg",
+    title:"Steals your identity",
+    body:"Raises your credit score"
+  },
+  {
+  username:"GoodGuyGreg",
+  title:"Reports a bug in your code",
+  body:"Sends you a Pull Request"
+  },
+  {
+  username:"ScumbagSteve",
+  title:"Borrows something",
+  body:"Sells it"
+  },
+  {
+  username:"ScumbagSteve",
+  title:"Borrows something",
+  body:"Sells it"
+  },
+  
+  {
+ username:"ScumbagSteve",
+ title:"Borrowseverything",
+ body:"Theend"
+  },
+{
+ username:"ScumbagSteve",
+ title:"Forksyourrepoongithub",
+ body:"Setstoprivate"
+}
+])
+
+db.comments.insertMany([
+ {
+   username:"GoodGuyGreg",
+   comment:"Hope you got a good deal!",
+   post:ObjectId("60a77825ef280223d03b8a9b")
+ },
+ {
+  username:"GoodGuyGreg",
+  comment:"Whats mine is yours!",
+  post:ObjectId("60a77825ef280223d03b8a9d")
+ },
+ {
+  username:"GoodGuyGreg",
+  comment:"Don't violate the licensing agreement!",
+  post:ObjectId("60a77825ef280223d03b8a9e")
+ },
+ 
+ {
+   username:"ScumbagSteve",
+   comment:"Itstillisn'tclean",
+   post:ObjectId("60a77825ef280223d03b8a98")
+ },
+ 
+ {
+   username:"ScumbagSteve",
+   comment:"DeniedyourPRcauseIfoundahack",
+   post: ObjectId("60a77825ef280223d03b8a9a")
+ }
+  ])
+
+//I did only last question from this as rest were all simple 
+
+db.posts.aggregate([
+   {
+      $lookup:
+         {
+           from: "comments",
+           let: { post_id: "$post"},
+           pipeline: [
+              { $match:
+                 { $expr:
+                 { $eq: ["$$post_id" ,"$_id"] },
+                }
+              },
+              // { $project: { username: 0, _id: 0 } }
+           ],
+           as: "Comments"
+         }
+    }
+])
+db.posts.aggregate([
+  {
+    "$lookup": {
+      "from": "comments",
+      "localField": "_id",
+      "foreignField": "post",
+      "as": "role"
+    }
+  },
+])
